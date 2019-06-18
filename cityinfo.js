@@ -6,10 +6,20 @@ const digitalClock = document.querySelector('.digital');
 const fecha = document.querySelector('.date');
 
 // add a search bar to search by country and change the time to it || search bar for wiki-link or more info about the city + weather 
-  // create a search bar (check if GoogleMaps API has something of the sort || or make your own)
+    // plan out the UI ---> location of the search bar, the clock, info-window.
 
-// adding dropped pins (check the Google Maps API?
 
+    // change time based on the location of the map
+        // api that shows time or timezone based off of current location on map?
+        // have api that shows time or timezone chosen based off of searchbox input?
+        // use new Date or api?
+
+    // display further information about city 
+      // through wiki?
+
+    
+    //display weather for area
+      // use openweather api based off of searchbox input 
 
 
 function setTime() {
@@ -73,6 +83,49 @@ function initAutocomplete(map) {
     searchBox.setBounds(map.getBounds());
   });
 
+  let markers = [];
+
+  searchBox.addListener('places_changed', function() {
+    var places = searchBox.getPlaces();
+    if (places.length == 0) {
+        return;
+      }
+    markers.forEach(function(marker) {
+      marker.setMap(null);
+    });
+    markers = [];
+
+    var bounds = new google.maps.LatLngBounds();
+    places.forEach(function(place) {
+      if (!place.geometry) {
+        console.log("Returned place contains no geometry");
+        return;
+      }
+      var icon = {
+        url: place.icon,
+        size: new google.maps.Size(71, 71),
+        origin: new google.maps.Point(0, 0),
+        anchor: new google.maps.Point(17, 34),
+        scaledSize: new google.maps.Size(25, 25)
+      };
+
+      // Create a marker for each place.
+      markers.push(new google.maps.Marker({
+        map: map,
+        icon: icon,
+        title: place.name,
+        position: place.geometry.location
+      }));
+
+      if (place.geometry.viewport) {
+        // Only geocodes have viewport.
+        bounds.union(place.geometry.viewport);
+      } else {
+        bounds.extend(place.geometry.location);
+      }
+      });
+      map.fitBounds(bounds);
+    });
 }
 
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
