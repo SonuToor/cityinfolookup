@@ -1,7 +1,3 @@
-
-const secondsHand = document.querySelector('.second-hand');
-const minutesHand = document.querySelector('.min-hand');
-const hoursHand = document.querySelector('.hour-hand');
 const digitalClock = document.querySelector('.digital');
 const fecha = document.querySelector('.date');
 
@@ -12,7 +8,7 @@ const fecha = document.querySelector('.date');
     // change time based on the location of the map
         // api that shows time or timezone based off of current location on map?
         // have api that shows time or timezone chosen based off of searchbox input?
-        // use new Date or api?
+        // use new Date or api?`
 
     // display further information about city 
       // through wiki?
@@ -28,15 +24,6 @@ function setTime() {
     const second = dateNow.getSeconds();
     const minute = dateNow.getMinutes();
     const hour = dateNow.getHours(); 
-
-    const secondDegrees = ((second / 60) * 360) + 90;
-    secondsHand.style.transform = `rotate(${secondDegrees}deg)`;
-    
-    const minuteDegrees = ((minute / 60) * 360) + 90;
-    minutesHand.style.transform = `rotate(${minuteDegrees}deg)`;
-
-    const hourDegrees = ((hour / 12) * 360) + 90; 
-    hoursHand.style.transform = `rotate(${hourDegrees}deg)`;
 
     digitalClock.innerHTML = (`${hour}:${minute}:${second}`);
 
@@ -73,13 +60,13 @@ function initMap() {
 }
 
 function initAutocomplete(map) {
-  // Create the search box and link it to the UI element.
+
   var input = document.getElementById('pac-input');
   var searchBox = new google.maps.places.SearchBox(input);
   map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
-  // Bias the SearchBox results towards current map's viewport.
   map.addListener('bounds_changed', function() {
+
     searchBox.setBounds(map.getBounds());
   });
 
@@ -94,6 +81,7 @@ function initAutocomplete(map) {
       marker.setMap(null);
     });
     markers = [];
+    let count = 0; 
 
     var bounds = new google.maps.LatLngBounds();
     places.forEach(function(place) {
@@ -109,7 +97,6 @@ function initAutocomplete(map) {
         scaledSize: new google.maps.Size(25, 25)
       };
 
-      // Create a marker for each place.
       markers.push(new google.maps.Marker({
         map: map,
         icon: icon,
@@ -117,14 +104,23 @@ function initAutocomplete(map) {
         position: place.geometry.location
       }));
 
+      markers[count].placeResult = place;
+
+      google.maps.event.addListener(markers[count], 'click', showInfoWindow);
+
       if (place.geometry.viewport) {
-        // Only geocodes have viewport.
+
         bounds.union(place.geometry.viewport);
       } else {
         bounds.extend(place.geometry.location);
       }
+      count++; 
+
+
       });
       map.fitBounds(bounds);
+
+      // get infowindow to pop up and then populate with local time, date and weather. 
     });
 }
 
