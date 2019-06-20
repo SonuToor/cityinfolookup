@@ -1,9 +1,4 @@
-const digitalClock = document.querySelector('.digital');
-const fecha = document.querySelector('.date');
-
-// add a search bar to search by country and change the time to it || search bar for wiki-link or more info about the city + weather 
-    // plan out the UI ---> location of the search bar, the clock, info-window.
-
+// add a search bar to search by country and change the time and date to it || search bar for wiki-link or more info about the city + weather 
 
     // change time based on the location of the map
         // api that shows time or timezone based off of current location on map?
@@ -13,29 +8,42 @@ const fecha = document.querySelector('.date');
     // display further information about city 
       // through wiki?
 
-    
     //display weather for area
       // use openweather api based off of searchbox input 
 
 
-function setTime() {
+function createContent(info) {
+
+  return `<h1>${info.title}</h1>
+          <p>Current Time: ${getTime()}</p>
+          <p>Current Date: ${getDate()}</p>`
+}
+
+function getTime() {
+
+  // TO DO (1)
+    // base the time being returned from this function on the location chosen by user
+    //  getTime(location) {
+    //    return location based off of the argument (location or UTC offset) provided by createContent call 
+    //  }
+
 
     const dateNow = new Date();
     const second = dateNow.getSeconds();
     const minute = dateNow.getMinutes();
     const hour = dateNow.getHours(); 
 
-    digitalClock.innerHTML = (`${hour}:${minute}:${second}`);
+    return `${hour}:${minute}:${second}`
 
 }
 
-function addDate() {
+function getDate() {
   const dateNow = new Date();
   const year = dateNow.getFullYear();
   const month = dateNow.getMonth();
   const day = dateNow.getDate();
-
-  fecha.innerHTML = (`${year}-${month + 1}-${day}`);
+  
+  return `${year}-${month + 1}-${day}`
 }
 
 var map;
@@ -70,7 +78,7 @@ function initAutocomplete(map) {
     searchBox.setBounds(map.getBounds());
   });
 
-  let markers = [];
+  var markers = [];
 
   searchBox.addListener('places_changed', function() {
     var places = searchBox.getPlaces();
@@ -80,10 +88,11 @@ function initAutocomplete(map) {
     markers.forEach(function(marker) {
       marker.setMap(null);
     });
-    markers = [];
-    let count = 0; 
 
+    markers = [];
+    var count = 0; 
     var bounds = new google.maps.LatLngBounds();
+
     places.forEach(function(place) {
       if (!place.geometry) {
         console.log("Returned place contains no geometry");
@@ -114,20 +123,25 @@ function initAutocomplete(map) {
       } else {
         bounds.extend(place.geometry.location);
       }
+
       count++; 
 
-      // var infowindow = new google.maps.InfoWindow({
-      //   content: contentString
-      // });
-      // marker.addListener('click', function() {
-      //   infowindow.open(map, marker);
-      // });
-      
       });
-      map.fitBounds(bounds);
 
-      // get infowindow to pop up and then populate with local time, date and weather. 
+    map.fitBounds(bounds);
+
     });
+}
+
+function showInfoWindow() {
+  var marker = this;
+  console.log(marker)
+  var infowindow = new google.maps.InfoWindow({
+    content: createContent(marker)
+  });
+  marker.addListener('click', function() {
+    infowindow.open(map, marker);
+  });
 }
 
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
@@ -138,8 +152,8 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
   infoWindow.open(map);
 }
 
-setInterval(setTime, 1000);
-addDate();
+// setInterval(setTime, 1000);
+// addDate();
 
 const googleMapsScript = document.createElement('script');
 googleMapsScript.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyDQ6gsqh3Z5Y6vwZBO0iqKFE4lMtJTY2pk&libraries=places&callback=initialize"
