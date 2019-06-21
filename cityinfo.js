@@ -15,29 +15,39 @@
 function createContent(info) {
 
   return `<h1>${info.title}</h1>
-          <p>Current Time: ${getTime()}</p>
+          <p>Current Time: ${getTime(info)}</p>
           <p>Current Date: ${getDate()}</p>`
 }
 
-function getTime() {
+function getTime(info) {
 
   // TO DO (1)
     // base the time being returned from this function on the location chosen by user
-    //  getTime(location) {
-    //    return location based off of the argument (location or UTC offset) provided by createContent call 
-    //  }
 
 
-    const dateNow = new Date();
-    const second = dateNow.getSeconds();
-    const minute = dateNow.getMinutes();
-    const hour = dateNow.getHours(); 
+    // PROBLEMS SO FAR
+
+      // (1) UTC gives you a 24 hour clock
+        // so currently imagine if its 23:00 (11:00 PM) and the location has an offset of +3:00 I am currently showing 26:00 instead of 2:00
+      // (2) It is static so time is not refreshing, ideally we want the time to be constantly refreshing.
+
+      
+    let dateNow = new Date();
+    let utcOffset = info.placeResult.utc_offset/60; 
+    const hour = dateNow.getUTCHours() + utcOffset; 
+    const minute = dateNow.getUTCMinutes();
+    const second = dateNow.getUTCSeconds();
+
 
     return `${hour}:${minute}:${second}`
 
 }
 
 function getDate() {
+
+  // TO DO (2)
+    // base the date on the current date in the chosen location. 
+
   const dateNow = new Date();
   const year = dateNow.getFullYear();
   const month = dateNow.getMonth();
@@ -135,7 +145,6 @@ function initAutocomplete(map) {
 
 function showInfoWindow() {
   var marker = this;
-  console.log(marker)
   var infowindow = new google.maps.InfoWindow({
     content: createContent(marker)
   });
@@ -151,9 +160,6 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
                         'Error: Your browser doesn\'t support geolocation.');
   infoWindow.open(map);
 }
-
-// setInterval(setTime, 1000);
-// addDate();
 
 const googleMapsScript = document.createElement('script');
 googleMapsScript.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyDQ6gsqh3Z5Y6vwZBO0iqKFE4lMtJTY2pk&libraries=places&callback=initialize"

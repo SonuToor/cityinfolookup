@@ -34,13 +34,6 @@ body {
     border-color: #4d90fe;
   }
 
-.clock {
-    z-index: 1;
-    margin: 50px auto;
-    position: relative;
-    padding: 2rem;
-}
-
 .latlong {
     font-family: 'Orbitron', sans-serif;
     color: black;
