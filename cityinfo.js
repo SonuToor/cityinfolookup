@@ -16,44 +16,49 @@ function createContent(info) {
 
   return `<h1>${info.title}</h1>
           <p>Current Time: ${getTime(info)}</p>
-          <p>Current Date: ${getDate()}</p>`
+          <p>Current Date: ${getDate(info)}</p>`
 }
 
 function getTime(info) {
 
   // TO DO (1)
     // base the time being returned from this function on the location chosen by user
-
-
     // PROBLEMS SO FAR
 
-      // (1) UTC gives you a 24 hour clock
-        // so currently imagine if its 23:00 (11:00 PM) and the location has an offset of +3:00 I am currently showing 26:00 instead of 2:00
+      // (1) Fix the formatting of the time.
+              // - Do you want it in 24HR format or AM/PM
+
       // (2) It is static so time is not refreshing, ideally we want the time to be constantly refreshing.
-
-      
-    let dateNow = new Date();
-    let utcOffset = info.placeResult.utc_offset/60; 
-    const hour = dateNow.getUTCHours() + utcOffset; 
-    const minute = dateNow.getUTCMinutes();
-    const second = dateNow.getUTCSeconds();
+          // call showInfoWindow with setTime?
 
 
-    return `${hour}:${minute}:${second}`
+  let dateNow = new Date();
+
+  utc = dateNow.getTime() + (dateNow.getTimezoneOffset() * 60000);
+  
+  let utcOffset = info.placeResult.utc_offset; 
+
+  localDate = new Date(utc + (60000 * utcOffset));
+
+  formattedTime = localDate.toTimeString()
+
+  return `${formattedTime}`
 
 }
 
-function getDate() {
+function getDate(info) {
 
-  // TO DO (2)
-    // base the date on the current date in the chosen location. 
+  let dateNow = new Date();
 
-  const dateNow = new Date();
-  const year = dateNow.getFullYear();
-  const month = dateNow.getMonth();
-  const day = dateNow.getDate();
+  utc = dateNow.getTime() + (dateNow.getTimezoneOffset() * 60000);
   
-  return `${year}-${month + 1}-${day}`
+  let utcOffset = info.placeResult.utc_offset; 
+
+  localDate = new Date(utc + (60000 * utcOffset));
+
+  formattedDate = localDate.toDateString()
+  
+  return `${formattedDate}`
 }
 
 var map;
