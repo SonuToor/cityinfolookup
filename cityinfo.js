@@ -11,38 +11,64 @@
     //display weather for area
       // use openweather api based off of searchbox input 
 
+let localWeather = []; 
 
 function createContent(info) {
+  let desc, temp = getWeather(info);
+
+  console.log(desc, temp);
+
+  description = localWeather[0];
+  temperature = localWeather[1];
+
+
+  console.log(description, temperature, localWeather)
 
   return `<h1>${info.title}</h1>
           <p>Current Time: ${getTime(info)}</p>
-          <p>Current Date: ${getDate(info)}</p>`
+          <p>Current Date: ${getDate(info)}</p>
+          <p>Current Weather: ${description} and the temperature is ${temperature}`
+}
+
+function getWeather(info) {
+
+  localWeather = [];
+
+  city = info.title;
+
+  currentWeather = `http://api.openweathermap.org/data/2.5/weather?q=${city}&APPID=954165525dad5eb35e297e0de45ca3fc`
+
+  fetch(currentWeather)
+  .then((resp) => resp.json())
+  .then(function(data) {
+    let description = data.weather[0].description;
+    let temperature = (Number(data.main.temp) - 273.15).toFixed(0); 
+
+    console.log(description, temperature)
+
+    localWeather.push(description, temperature);
+
+    return description, temperature; 
+
+  });
 }
 
 function getTime(info) {
 
-  // TO DO (1)
-    // base the time being returned from this function on the location chosen by user
-    // PROBLEMS SO FAR
-
-      // (1) Fix the formatting of the time.
-              // - Do you want it in 24HR format or AM/PM
-
       // (2) It is static so time is not refreshing, ideally we want the time to be constantly refreshing.
           // call showInfoWindow with setTime?
 
-
   let dateNow = new Date();
 
-  utc = dateNow.getTime() + (dateNow.getTimezoneOffset() * 60000);
+  let utc = dateNow.getTime() + (dateNow.getTimezoneOffset() * 60000);
   
   let utcOffset = info.placeResult.utc_offset; 
 
-  localDate = new Date(utc + (60000 * utcOffset));
+  let localDate = new Date(utc + (60000 * utcOffset));
 
-  formattedTime = localDate.toTimeString()
+  let timeString = (localDate.toTimeString()).slice(0, 5);
 
-  return `${formattedTime}`
+  return `${timeString}`
 
 }
 
