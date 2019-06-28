@@ -11,47 +11,37 @@
     //display weather for area
       // use openweather api based off of searchbox input 
 
-let localWeather = []; 
+let localWeather; 
 
 function createContent(info) {
-  let desc, temp = getWeather(info);
 
-  console.log(desc, temp);
+  let data =  getWeather(info);
 
-  description = localWeather[0];
-  temperature = localWeather[1];
-
-
-  console.log(description, temperature, localWeather)
+  console.log(data);  
 
   return `<h1>${info.title}</h1>
           <p>Current Time: ${getTime(info)}</p>
           <p>Current Date: ${getDate(info)}</p>
-          <p>Current Weather: ${description} and the temperature is ${temperature}`
+          <p>Current Weather:`
 }
 
-function getWeather(info) {
+async function getWeather(info) {
+  
+  let city = info.title;
+  let currentWeather = `http://api.openweathermap.org/data/2.5/weather?q=${city}&APPID=954165525dad5eb35e297e0de45ca3fc`
 
-  localWeather = [];
+  let response = await fetch(currentWeather)
 
-  city = info.title;
+  let data = await response.json();
+  
+  let description = data.weather[0].description;
+  let temperature = (Number(data.main.temp) - 273.15).toFixed(0); 
 
-  currentWeather = `http://api.openweathermap.org/data/2.5/weather?q=${city}&APPID=954165525dad5eb35e297e0de45ca3fc`
+  // console.log(description, temperature);
 
-  fetch(currentWeather)
-  .then((resp) => resp.json())
-  .then(function(data) {
-    let description = data.weather[0].description;
-    let temperature = (Number(data.main.temp) - 273.15).toFixed(0); 
-
-    console.log(description, temperature)
-
-    localWeather.push(description, temperature);
-
-    return description, temperature; 
-
-  });
+  return data
 }
+
 
 function getTime(info) {
 
