@@ -1,28 +1,28 @@
-// add a search bar to search by country and change the time and date to it || search bar for wiki-link or more info about the city + weather 
 
-    // change time based on the location of the map
-        // api that shows time or timezone based off of current location on map?
-        // have api that shows time or timezone chosen based off of searchbox input?
-        // use new Date or api?`
+let description;
+let temperature; 
 
-    // display further information about city 
-      // through wiki?
-
-    //display weather for area
-      // use openweather api based off of searchbox input 
-
-let localWeather; 
-
+// Can't make createContent async or it will also return a promise not the desired content
 function createContent(info) {
 
-  let data =  getWeather(info);
+  // there are still issues here 
+    // sometimes displays the weather of the previous city selection
 
-  console.log(data);  
+  data = getWeather(info); 
+
+  data.then(function(data) {
+
+    description = data.weather[0].description;
+    temperature = (Number(data.main.temp) - 273.15).toFixed(0); 
+  });
+
+
+  console.log(info.title, description, temperature);
 
   return `<h1>${info.title}</h1>
-          <p>Current Time: ${getTime(info)}</p>
-          <p>Current Date: ${getDate(info)}</p>
-          <p>Current Weather:`
+  <p>Current Time: ${getTime(info)}</p>
+  <p>Current Date: ${getDate(info)}</p>
+  <p>Current Weather:${description}, ${temperature}°C`
 }
 
 async function getWeather(info) {
@@ -33,13 +33,9 @@ async function getWeather(info) {
   let response = await fetch(currentWeather)
 
   let data = await response.json();
+
+  return data; 
   
-  let description = data.weather[0].description;
-  let temperature = (Number(data.main.temp) - 273.15).toFixed(0); 
-
-  // console.log(description, temperature);
-
-  return data
 }
 
 
