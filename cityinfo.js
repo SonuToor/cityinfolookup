@@ -1,4 +1,3 @@
-
 let description;
 let temperature; 
 
@@ -14,6 +13,7 @@ function createContent(info) {
 
     description = data.weather[0].description;
     temperature = (Number(data.main.temp) - 273.15).toFixed(0); 
+
   });
 
 
@@ -103,6 +103,7 @@ function initAutocomplete(map) {
   map.addListener('bounds_changed', function() {
 
     searchBox.setBounds(map.getBounds());
+
   });
 
   var markers = [];
@@ -160,14 +161,14 @@ function initAutocomplete(map) {
     });
 }
 
+// want to prevent mulitiple windows from opening up?
+  // how to get the window to constantly refresh?
 function showInfoWindow() {
   var marker = this;
-  var infowindow = new google.maps.InfoWindow({
-    content: createContent(marker)
-  });
-  marker.addListener('click', function() {
-    infowindow.open(map, marker);
-  });
+
+  var infowindow = new google.maps.InfoWindow();
+  infowindow.setContent(createContent(marker));
+  infowindow.open(map, marker);
 }
 
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
