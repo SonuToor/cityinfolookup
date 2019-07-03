@@ -1,20 +1,26 @@
 let description;
 let temperature; 
 
-// Can't make createContent async or it will also return a promise not the desired content
 function createContent(info) {
 
   // there are still issues here 
     // sometimes displays the weather of the previous city selection
 
-  data = getWeather(info); 
+  let resp = getWeather(info); 
 
-  data.then(function(data) {
-
+  resp.then((resp) => resp.json())
+  .then(function(data) {
     description = data.weather[0].description;
     temperature = (Number(data.main.temp) - 273.15).toFixed(0); 
-
   });
+
+  // data.then(function(data) {
+    
+  //   console.log(description, temperature, "this is after calling .then on the data returned by getWeather")
+  //   description = data.weather[0].description;
+  //   temperature = (Number(data.main.temp) - 273.15).toFixed(0); 
+
+  // });
 
 
   console.log(info.title, description, temperature);
@@ -32,9 +38,11 @@ async function getWeather(info) {
 
   let response = await fetch(currentWeather)
 
-  let data = await response.json();
+  // let data = await response.json();
 
-  return data; 
+  // console.log(data, "what getWeather returns"); 
+
+  return response; 
   
 }
 
@@ -76,6 +84,7 @@ function getDate(info) {
 var map;
 
 function initialize() {
+  console.log("first initialize")
   initMap();
 }
 
@@ -90,6 +99,7 @@ function initMap() {
         zoom: 13,
         mapTypeID: 'terrain'
       });
+    console.log("set up the map")
     initAutocomplete(map)
   });
 }
@@ -143,7 +153,14 @@ function initAutocomplete(map) {
 
       markers[count].placeResult = place;
 
-      google.maps.event.addListener(markers[count], 'click', showInfoWindow);
+      var infowindow = new google.maps.InfoWindow();
+
+      google.maps.event.addListener(markers[count], 'click', function() {
+        
+        console.log("added the listener to the marker, now about to call create content")
+        infowindow.setContent(createContent(this));
+        infowindow.open(map, this);
+      });
 
       if (place.geometry.viewport) {
 
@@ -152,23 +169,13 @@ function initAutocomplete(map) {
         bounds.extend(place.geometry.location);
       }
 
-      count++; 
-
-      });
+      count++;
+      
+    });
 
     map.fitBounds(bounds);
-
+  
     });
-}
-
-// want to prevent mulitiple windows from opening up?
-  // how to get the window to constantly refresh?
-function showInfoWindow() {
-  var marker = this;
-
-  var infowindow = new google.maps.InfoWindow();
-  infowindow.setContent(createContent(marker));
-  infowindow.open(map, marker);
 }
 
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
