@@ -2,17 +2,19 @@ var map;
 let description;
 let temperature;
 
-
+// format the content for the infowindow and return it
 function createContent(info) {
+
+  description = description.charAt(0).toUpperCase() + description.slice(1);
 
   return `<h1>${info.title}</h1>
   <p>Current Time: ${getTime(info)}</p>
   <p>Current Date: ${getDate(info)}</p>
-  <p>Current Weather:${description}, ${temperature}°C`
+  <p>Current Weather: ${description}, ${temperature}°C.`
 }
 
 
-
+// an asychronous function that returns the weather based on the selected city from openweather api
 async function getWeather(info) {
   
   let city = info.title;
@@ -24,7 +26,7 @@ async function getWeather(info) {
   return data; 
 }
 
-
+// gets the local time from the selected city
 function getTime(info) {
 
   let dateNow = new Date();
@@ -39,6 +41,7 @@ function getTime(info) {
 
 }
 
+// gets the local date for the selected city 
 function getDate(info) {
 
   let dateNow = new Date();
@@ -52,27 +55,36 @@ function getDate(info) {
   return `${formattedDate}`
 }
 
+// the initializer function, the script uses this asyncronously as the callback.
 function initialize() {
   initMap();
 }
 
+// instantiates the map
 function initMap() {
   let pos;
-  navigator.geolocation.getCurrentPosition(function(position) {
-    pos = {
-      lat : position.coords.latitude,
-      lng : position.coords.longitude };
-    map = new google.maps.Map(document.getElementById('map'), {
-        center: pos,
-        zoom: 13,
-        mapTypeID: 'terrain'
-      });
-    initAutocomplete(map)
-  });
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      pos = {
+        lat : position.coords.latitude,
+        lng : position.coords.longitude };
+      map = new google.maps.Map(document.getElementById('map'), {
+          center: pos,
+          zoom: 13,
+          mapTypeID: 'terrain'
+        });
+      initAutocomplete(map)
+    });
+  }
+  else {
+    handleLocationError(false, map.getCenter());
+  }
 }
 
+// creates the search input, adds the listener to it, then creates the marker and infowindow for the city selection 
 function initAutocomplete(map) {
 
+  // create searchbox
   var input = document.getElementById('pac-input');
   var searchBox = new google.maps.places.SearchBox(input);
   map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
@@ -83,6 +95,7 @@ function initAutocomplete(map) {
 
   var markers = [];
 
+  // add a listener which adjusts the viewport and begins the process of placing a marker 
   searchBox.addListener('places_changed', function() {
 
     var places = searchBox.getPlaces();
@@ -126,13 +139,15 @@ function initAutocomplete(map) {
       else {
         bounds.extend(place.geometry.location);
       }
-
+      
+      // getting the weather is done here to avoid receiving the promise unresolved 
       let weather = getWeather(markers[count]);
       weather.then(function(data) {
         description = data.weather[0].description;
         temperature = (Number(data.main.temp) - 273.15).toFixed(0);     
       });
 
+      // create an infowindow and when the marker is clicked the infowindow opens with corresponding information
       var infowindow = new google.maps.InfoWindow();
       google.maps.event.addListener(markers[count], 'click', function() {
         
@@ -149,7 +164,9 @@ function initAutocomplete(map) {
     });
 }
 
-function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+// error handling if the initial geolocation doesn't work 
+function handleLocationError(browserHasGeolocation, pos) {
+  infoWindow = new google.maps.InfoWindow;
   infoWindow.setPosition(pos);
   infoWindow.setContent(browserHasGeolocation ?
                         'Error: The Geolocation service failed.' :
